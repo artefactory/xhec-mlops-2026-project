@@ -24,3 +24,6 @@ jobs:
 
       - name: Check code quality
         run: uv run --locked pre-commit run --all-files --show-diff-on-failure
+
+      - name: Test training and saved predictions
+        run: uv run --locked python -m unittest discover -s tests
