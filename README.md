@@ -17,7 +17,7 @@ Welcome to your MLOps project! In this hands-on project, you'll build a complete
 
 Traditionally, determining an abalone's age requires:
 1. Cutting the shell through the cone
-2. Staining it 
+2. Staining it
 3. Counting rings under a microscope (very time-consuming!)
 
 **Your Goal**: Use easier-to-obtain physical measurements (shell weight, diameter, etc.) to predict the age automatically.
@@ -30,31 +30,49 @@ Traditionally, determining an abalone's age requires:
 ### Prerequisites
 - GitHub account
 - [Kaggle account](https://www.kaggle.com/account/login?phase=startRegisterTab&returnUrl=%2F) (for dataset download)
+- [uv](https://docs.astral.sh/uv/getting-started/installation/) package manager
 - Python 3.10 or 3.11
+
+### Team
+
+| Name | GitHub |
+|------|--------|
+| Wei Chieh | [@weichieh-chou](https://github.com/weichieh-chou) |
+| Martin d'Halloy | [@martdhal](https://github.com/martdhal) |
+| Harshita Goyal | [@hxrshu](https://github.com/hxrshu) |
+| Maximilien Lucille | [@MaximilienLuc](https://github.com/MaximilienLuc) |
 
 ### Setup Steps
 
-1. **Fork this repository** 
+1. **Fork this repository**
    - ⚠️ **Important**: Uncheck "Copy the `main` branch only" to get all project branches
-   
+
 2. **Add your team members** as admins to your forked repository
 
 3. **Set up your development environment**:
    ```bash
-   # Create and activate a virtual environment
-   uv sync 
-   source venv/bin/activate # on Windows: venv\Scripts\activate
+   # Install dependencies (creates .venv) and sync the lockfile
+   uv sync --all-groups
 
-   # Install pre-commit hooks for code quality
-    uv pip install pre-commit
-    uv run pre-commit install
+   # Activate the virtual environment
+   source .venv/bin/activate  # on Windows: .venv\Scripts\activate
+
+   # Install pre-commit hooks (runs ruff + formatting checks before each commit)
+   uv run pre-commit install
    ```
+
+4. **Verify the setup**:
+   ```bash
+   uv run pre-commit run --all-files
+   ```
+
+   Continuous integration runs the same checks on every push and pull request (see `.github/workflows/ci.yaml`).
 
 ## 📋 What You'll Build
 
 By the end of this project, you'll have created:
 
-### 🤖 **Automated ML Pipeline** 
+### 🤖 **Automated ML Pipeline**
 - Training workflows using Prefect
 - Automatic model retraining on schedule
 - Reproducible model and data processing
@@ -67,7 +85,7 @@ By the end of this project, you'll have created:
 ### 📊 **Production-Ready Code**
 - Clean, well-documented code
 - Automated testing and formatting
-- Proper error handling 
+- Proper error handling
 
 ## 📝 How to Work on This Project
 
@@ -102,7 +120,7 @@ git push
 
 Then:
 1. 📖 Read the PR_i.md file carefully
-2. 💻 Complete all the TODOs in the code  
+2. 💻 Complete all the TODOs in the code
 3. 🔧 Test your changes
 4. 📤 Open **ONE** pull request to your main branch
 5. ✅ Merge the pull request
@@ -147,16 +165,16 @@ uv sync
 
 Your project will be evaluated on:
 
-### 🔍 **Code Quality** 
+### 🔍 **Code Quality**
 - Clean, readable code structure
-- Proper naming conventions  
+- Proper naming conventions
 - Good use of docstrings and type hints
 
 ### 🎨 **Code Formatting**
 - Consistent style (automated with pre-commit)
 - Professional presentation
 
-### ⚙️ **Functionality** 
+### ⚙️ **Functionality**
 - Code runs without errors
 - All requirements implemented correctly
 
@@ -177,10 +195,10 @@ When you're done, your repository should contain:
 
 ✅ **Automated Training Pipeline**
 - [ ] Prefect workflows for model training
-- [ ] Separate modules for training and inference  
+- [ ] Separate modules for training and inference
 - [ ] Reproducible model and encoder generation
 
-✅ **Automated Deployment**  
+✅ **Automated Deployment**
 - [ ] Prefect deployment for regular retraining
 
 ✅ **Production API**
