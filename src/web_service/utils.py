@@ -1,10 +1,11 @@
-# Utils file. TODO: add a `load_object` function to load pickle objects
+# Utility functions of the web service.
+
 import pickle
 from pathlib import Path
 from typing import Any
 
-def load_object(data:Path) -> Any:
 
-    with open(data, 'rb') as file:
-        loaded_data = pickle.load(file)
-        return loaded_data
+def load_object(path: Path) -> Any:
+    """Load a pickled object (e.g. the trained model) from disk."""
+    with open(path, "rb") as f:
+        return pickle.load(f)

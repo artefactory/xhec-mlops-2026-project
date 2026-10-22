@@ -1,0 +1,10 @@
+.git
+.venv
+.ruff_cache
+**/__pycache__
+*.egg-info
+data
+notebooks
+mlruns
+mlartifacts
+mlflow.db
