@@ -79,9 +79,17 @@ dmypy.json
 # VSCode project settings
 .vscode/
 
+# Ruff
+.ruff_cache/
+
 # Secret files
 secrets/*
 !secrets/.gitkeep
 
 # Mac files
 .DS_Store
+
+# Data and MLflow artifacts
+data/
+mlruns/
+mlartifacts/
