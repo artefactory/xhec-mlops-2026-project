@@ -68,6 +68,46 @@ Traditionally, determining an abalone's age requires:
 
    Continuous integration runs the same checks on every push and pull request (see `.github/workflows/ci.yaml`).
 
+5. **Download the dataset** and place it at `data/abalone.csv` (see [Kaggle](https://www.kaggle.com/datasets/rodolfomendes/abalone-dataset)).
+
+### Train the model with Prefect
+
+The training pipeline lives in `src/modelling/` and is orchestrated with Prefect `flow` and `task` objects.
+
+**Run a one-off training** (from the project root, with the virtual environment active):
+
+```bash
+cd src/modelling
+python main.py ../../data/abalone.csv
+```
+
+Pickled artifacts are written to `src/web_service/local_objects/` (`model.pkl` and `dict_vectorizer.pkl`).
+
+**Run the Prefect UI and scheduled retraining**
+
+1. Point the CLI at your local Prefect server (Windows users may prefer `127.0.0.1` instead of `0.0.0.0`):
+
+   ```bash
+   prefect config set PREFECT_API_URL=http://0.0.0.0:4200/api
+   ```
+
+2. Start the Prefect server (leave this terminal open):
+
+   ```bash
+   prefect server start --host 0.0.0.0
+   ```
+
+   Open the dashboard at [http://localhost:4200](http://localhost:4200).
+
+3. In **another terminal**, serve the retraining deployment (see `cron` in `deployment.py`):
+
+   ```bash
+   cd src/modelling
+   python deployment.py
+   ```
+
+4. In the UI, go to **Deployments** → **train-model**. Use **Quick Run** to trigger training immediately, then open the latest **Flow run** to inspect each task (load, split, preprocess, train, evaluate, save).
+
 ## 📋 What You'll Build
 
 By the end of this project, you'll have created:
@@ -156,6 +196,15 @@ Then sync the environment and regenerate the dependency files:
 uv sync
 ```
 
+The repo also keeps `requirements.in` / `requirements-dev.in` (pip-tools) in sync with `pyproject.toml`. After changing `.in` files, recompile the lock files:
+
+```bash
+source .venv/bin/activate
+pip install pip-tools
+pip-compile requirements.in -o requirements.txt
+pip-compile requirements-dev.in -o requirements-dev.txt
+```
+
 ### Code Quality
 - The pre-commit hooks will automatically format your code
 - Remove all TODOs and unused code before final submission
@@ -191,26 +240,30 @@ Your project will be evaluated on:
 
 ## 🎯 Final Deliverables Checklist
 
-When you're done, your repository should contain:
+Progress through **branch 3 (`3/use_prefect`)** — items below reflect what is done on this branch vs. still to come (branches 4+).
 
 ✅ **Automated Training Pipeline**
-- [ ] Prefect workflows for model training
-- [ ] Separate modules for training and inference
-- [ ] Reproducible model and encoder generation
+- [x] Prefect workflows for model training (`src/modelling/main.py`: `@flow` / `@task`)
+- [x] Separate modules for training and inference (`training.py`, `predicting.py`, `preprocessing.py`)
+- [x] Reproducible model and encoder generation (`model.pkl`, `dict_vectorizer.pkl` in `src/web_service/local_objects/`)
 
 ✅ **Automated Deployment**
-- [ ] Prefect deployment for regular retraining
+- [x] Prefect deployment for regular retraining (`src/modelling/deployment.py`)
 
-✅ **Production API**
+✅ **Production API** *(branch 4+)*
 - [ ] Working REST API for predictions
 - [ ] Pydantic input validation
 - [ ] Docker containerization
 
 ✅ **Professional Documentation**
-- [ ] Updated README with team info
-- [ ] Clear setup and run instructions
-- [ ] All TODOs removed from code
+- [x] Updated README with team info
+- [x] Clear setup and run instructions (env setup, training, Prefect UI)
+- [x] All TODOs removed from code under `src/`
+
+✅ **Dependencies (PR 3)**
+- [x] `prefect` in `pyproject.toml` / `uv.lock`
+- [x] `requirements.in` / `requirements-dev.in` updated and compiled to `.txt`
 
 ---
 
-**Ready to start? Head to branch_0 and read PR_0.md for your first task! 🚀**
+**Next step:** merge PR 3, then check out branch `4/deploy_model_api` for the API and Docker tasks.
