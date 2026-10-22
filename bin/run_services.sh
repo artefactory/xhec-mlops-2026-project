@@ -1,6 +1,5 @@
-#!/bin/bash
+#!/bin/sh
+set -eu
 
-# TODO: Use this file in your Dockerfile to run the services
-
-prefect server start --host 0.0.0.0 --port 4201 &
-uvicorn src.web_service.main:app --host 0.0.0.0 --port 8001
+# Replace the shell so Docker stop reaches Uvicorn directly.
+exec uvicorn src.web_service.main:app --host 0.0.0.0 --port 8001

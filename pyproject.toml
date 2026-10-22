@@ -20,12 +20,15 @@ dependencies = [
   "pandas",
   "scikit-learn",
   "prefect>=3.9.0",
+  "fastapi>=0.115,<1",
+  "uvicorn>=0.30,<1",
 ]
 
 [dependency-groups]
 dev = [
   "pre-commit>=4,<5",
   "ruff>=0.12,<1",
+  "httpx>=0.28,<1",
 ]
 notebook = [
   "ipykernel",

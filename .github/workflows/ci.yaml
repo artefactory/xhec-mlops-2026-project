@@ -27,3 +27,22 @@ jobs:
 
       - name: Test training and saved predictions
         run: uv run --locked python -m unittest discover -s tests
+
+      - name: Build API container
+        run: docker build -f Dockerfile.app -t abalone-api:ci .
+
+      - name: Create offline model fixture and start container
+        run: |
+          uv run --locked python -m tests.fixtures src/web_service/local_objects/model.pkl
+          docker run -d --name abalone-api-ci -p 127.0.0.1:8000:8001 \
+            --mount type=bind,source="$PWD/src/web_service/local_objects",target=/app/src/web_service/local_objects,readonly \
+            abalone-api:ci
+
+      - name: Verify container predictions and validation
+        run: uv run --locked python -m scripts.smoke_api
+
+      - name: Container logs and cleanup
+        if: always()
+        run: |
+          docker logs abalone-api-ci || true
+          docker rm -f abalone-api-ci || true
