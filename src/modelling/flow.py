@@ -1,10 +1,11 @@
 # This module is the training flow with Prefect: each step is a task and the flow runs them in order.
 
 import argparse
+from pathlib import Path
 
 import pandas as pd
 from prefect import flow, task
-from preprocessing import build_features, clean_data, load_data
+from preprocessing import TARGET, build_features, clean_data, load_data
 from sklearn.ensemble import RandomForestRegressor
 from training import train_model
 from utils import pickle_object
@@ -28,7 +29,7 @@ def clean_data_task(df: pd.DataFrame) -> pd.DataFrame:
 @task
 def build_features_task(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
     """Get the features and the target."""
-    return build_features(df)
+    return build_features(df), df[TARGET]
 
 
 @task
@@ -40,7 +41,7 @@ def train_model_task(X: pd.DataFrame, y: pd.Series) -> RandomForestRegressor:
 @task
 def save_model_task(model: RandomForestRegressor, path: str) -> None:
     """Save the model as a pickle."""
-    pickle_object(model, path)
+    pickle_object(model, Path(path))
 
 
 @flow
