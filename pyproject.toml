@@ -37,7 +37,7 @@ docstring-code-format = true
 
 [tool.ruff.lint]
 select = ["D", "ANN", "E", "W", "F", "N", "Q", "ARG", "PTH"]
-ignore = ["D417", "D100", "PD901", "N806", "N815", "N803", "ANN401"]
+ignore = ["D417", "D100", "N806", "N815", "N803", "ANN401"]
 
 [tool.ruff.lint.per-file-ignores]
 "*.ipynb" = ["D", "ANN"]
