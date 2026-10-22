@@ -19,6 +19,7 @@ dependencies = [
   "numpy",
   "pandas",
   "scikit-learn",
+  "prefect>=3.9.0",
 ]
 
 [dependency-groups]
