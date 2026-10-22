@@ -1,4 +1,4 @@
-.PHONY: install lint mlflow-ui
+.PHONY: install lint mlflow-ui train-script
 
 install:
 	uv sync
@@ -9,3 +9,6 @@ lint:
 
 mlflow-ui:
 	uv run mlflow ui --backend-store-uri mlruns
+
+train-script:
+	uv run python src/modelling/main.py data/abalone.csv

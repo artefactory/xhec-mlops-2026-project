@@ -55,6 +55,24 @@ Traditionally, determining an abalone's age requires:
    make lint
    ```
 
+### Explore the data and track experiments
+
+The notebooks are in `notebooks/` (run them from that folder): `eda.ipynb` (data exploration) and `modelling.ipynb` (first model, tracked with MLflow). To compare the MLflow runs:
+
+```bash
+make mlflow-ui
+```
+
+Then open http://localhost:5000.
+
+### Train the model
+
+```bash
+make train-script
+```
+
+This runs `src/modelling/main.py` on `data/abalone.csv`: it preprocesses the data, trains a linear regression, logs the test RMSE and saves the model (`model.pkl`) and the encoder (`dv.pkl`) in `src/web_service/local_objects/`, where the API loads them.
+
 ## 📋 What You'll Build
 
 By the end of this project, you'll have created:
