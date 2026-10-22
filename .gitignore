@@ -44,6 +44,8 @@ target/
 
 # Downloaded datasets
 /data/
+notebooks/mlruns/
+notebooks/mlflow.db
 
 # IPython
 profile_default/
