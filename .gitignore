@@ -85,3 +85,7 @@ secrets/*
 
 # Mac files
 .DS_Store
+
+# Data files
+*.csv
+data/
