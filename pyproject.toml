@@ -6,9 +6,51 @@ build-backend = "setuptools.build_meta"
 name = "xhec-mlops-project-student"
 version = "0.0.1"
 authors = [
-  { name = "username", email = "user@email.com" },
-] # TODO: add authors here
+  { name = "erwanfrancotetu"},
+  { name = "ithierda"},
+  { name = "Licheng1004"},
+  { name = "bhaveshchauhan2407"},
+]
 description = "X-HEC MLOps Project on Abalone age prediction model"
-requires-python = ">3.10" # TODO: update this version
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "fastapi==0.103.2",
+    "griffe<1.0.0",
+    "ipykernel==6.25.2",
+    "loguru==0.7.2",
+    "pandas==2.1.1",
+    "prefect==2.13.7",
+    "pydantic>=1,<2",
+    "scikit-learn==1.5.2",
+    "seaborn==0.12.2",
+    "uvicorn==0.23.2",
+]
 
-# TODO: add pydantic, pre-commit and ruff as a dependency
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 130
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint]
+select = ["D", "ANN", "E", "W", "F", "N", "Q", "ARG", "PTH"]
+ignore = ["D417", "D100", "PD901", "N806", "N815", "N803", "ANN401"]
+
+[tool.ruff.lint.per-file-ignores]
+"*.ipynb" = ["D", "ANN"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.isort]
+order-by-type = true
+
+[dependency-groups]
+dev = [
+    "nbstripout>=0.9.1",
+    "pre-commit>=4.7.0",
+    "ruff>=0.17.1",
+]
