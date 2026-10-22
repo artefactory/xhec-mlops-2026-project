@@ -43,6 +43,7 @@ target/
 .ipynb_checkpoints
 
 # Downloaded datasets
+/src/web_service/local_objects/*.pkl
 /data/
 notebooks/mlruns/
 notebooks/mlflow.db
