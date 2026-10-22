@@ -6,6 +6,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import numpy as np
 import pandas as pd
@@ -15,7 +16,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-from src.modelling.main import main
+from src.modelling.deployment import serve_daily_training
+from src.modelling.main import main, train_abalone_model
 from src.modelling.predicting import predict
 from src.modelling.preprocessing import split_features_target
 from src.modelling.training import train_model
@@ -85,6 +87,31 @@ class ModellingTests(unittest.TestCase):
             predictions = predict(model_path, features)
             self.assertEqual(len(predictions), len(features))
             self.assertTrue(np.isfinite(predictions).all())
+
+    def test_prefect_training_flow(self):
+        with tempfile.TemporaryDirectory() as directory:
+            csv_path = Path(directory) / "abalone.csv"
+            model_path = Path(directory) / "model.pkl"
+            self.data.to_csv(csv_path, index=False)
+
+            metrics = train_abalone_model(csv_path, model_path)
+
+            self.assertEqual(set(metrics), {"rmse", "mae", "r2"})
+            self.assertTrue(all(np.isfinite(value) for value in metrics.values()))
+            self.assertTrue(model_path.is_file())
+
+    def test_daily_deployment_schedule(self):
+        with patch("src.modelling.deployment.train_abalone_model.serve") as serve:
+            serve_daily_training()
+
+        arguments = serve.call_args.kwargs
+        self.assertEqual(arguments["name"], "daily-abalone-retraining")
+        self.assertEqual(arguments["schedule"].cron, "0 2 * * *")
+        self.assertEqual(arguments["schedule"].timezone, "UTC")
+        self.assertEqual(
+            arguments["parameters"]["trainset_path"],
+            str(Path("data/abalone.csv").resolve()),
+        )
 
     def test_command_line_training_and_prediction(self):
         """A separate Python process can load the artifact and predict."""

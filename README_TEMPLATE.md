@@ -105,3 +105,109 @@ GitHub automatically runs the configured checks on pushes and pull requests. To 
 ## Repository structure
 
 - [Describe the main project directories and files once the implementation is complete.]
+
+
+## Part 2: train from Python modules
+
+From the repository root, place the headered Abalone CSV at `data/abalone.csv`
+(the same dataset used in Part 1), then run:
+
+```bash
+uv sync --locked --python 3.11
+uv run python -m src.modelling.main data/abalone.csv
+```
+
+The CSV must contain `Rings` and the original measurement columns, including
+`Sex`. The target is age in years (`Rings + 1.5`). The baseline uses an 80/20
+train/test split with seed 42, one-hot encoding, numeric scaling, and linear
+regression. Preprocessing is fitted only on the training split. The command
+prints held-out RMSE, MAE, and R² and saves the fitted pipeline to
+`src/web_service/local_objects/model.pkl`. Override the destination with
+`--model-path path/to/model.pkl`. Generated pickles are ignored by Git.
+
+Verified on the 4,177-row Kaggle dataset with this split: RMSE **2.212 years**,
+MAE **1.593 years**, R² **0.548** on 836 held-out rows. The saved model is the
+same training-split model used for evaluation, not a refit on the full dataset.
+The optional log-target experiment gets RMSE 2.220, MAE 1.570, and R² 0.545
+on that same split. We retain the baseline for its lower RMSE and simplicity;
+the log-target experiment has slightly lower MAE. These are held-out results
+for this split, not a guarantee of performance on new populations.
+
+To predict from a trusted local model in a new process (prints a CSV of ages):
+
+```bash
+uv run python -m src.modelling.predicting src/web_service/local_objects/model.pkl data/abalone.csv
+```
+
+The prediction command accepts a measurement-only CSV or the training CSV;
+it ignores `Rings` and `Age` if present. To call prediction from Python:
+
+```python
+from pathlib import Path
+import pandas as pd
+from src.modelling.predicting import predict
+
+features = pd.read_csv("data/abalone.csv").drop(
+    columns=["Rings", "Age"], errors="ignore"
+)
+ages = predict(Path("src/web_service/local_objects/model.pkl"), features)
+```
+
+Run checks with `uv run pre-commit run --all-files` and
+`uv run python -m unittest discover -s tests`. Part 2 uses the untransformed
+baseline; the notebook's optional log-target experiment and MLflow tracking
+remain in the notebook.
+
+## Part 3: schedule model retraining with Prefect
+
+After completing Part 2, make sure `data/abalone.csv` exists. Install all
+project and notebook dependencies from the repository root:
+
+```bash
+uv sync --locked --group notebook
+```
+
+The training command now runs the Prefect flow immediately, records its tasks
+and metrics, and saves the model:
+
+```bash
+uv run python -m src.modelling.main data/abalone.csv
+```
+
+To register a local deployment that retrains daily at 02:00 UTC, open a
+terminal at the repository root and start the Prefect server:
+
+```bash
+uv run prefect server start --host 127.0.0.1
+```
+
+Keep that terminal open. In a second terminal, point the Prefect CLI and
+deployment runner at the local server, then start the deployment:
+
+PowerShell:
+
+```powershell
+$env:PREFECT_API_URL = "http://127.0.0.1:4200/api"
+uv run python -m src.modelling.deployment
+```
+
+macOS/Linux:
+
+```bash
+PREFECT_API_URL=http://127.0.0.1:4200/api uv run python -m src.modelling.deployment
+```
+
+Keep the deployment terminal running for scheduled retraining. Open
+<http://127.0.0.1:4200> to view flow runs and task states. The schedule is
+paused when the deployment process stops. To trigger a run immediately, open a
+third terminal, set `PREFECT_API_URL` as above, and run:
+
+```bash
+uv run prefect deployment run "Abalone model training/daily-abalone-retraining" --watch
+```
+
+Stop the server and deployment runner with `Ctrl+C` in their respective
+terminals when finished. Prefect's local server and run history are for
+development and should not be committed.
+
+<div align="center">
