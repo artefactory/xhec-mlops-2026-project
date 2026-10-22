@@ -87,6 +87,10 @@ secrets/*
 # Data
 data/
 
+# MLflow
+mlruns/
+mlartifacts/
+
 # .md
 PROJECT_GUIDE.md
 TEAM_PLAN.md
