@@ -5,16 +5,17 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from config import DV_PATH, MODEL_PATH
-from predicting import predict
 from prefect import flow, task
-from preprocessing import clean_data, extract_x_y, load_data
 from scipy.sparse import csr_matrix
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.model_selection import train_test_split
-from training import evaluate_model, train_model
-from utils import pickle_object
+
+from src.modelling.config import DV_PATH, MODEL_PATH
+from src.modelling.predicting import predict
+from src.modelling.preprocessing import clean_data, extract_x_y, load_data
+from src.modelling.training import evaluate_model, train_model
+from src.modelling.utils import pickle_object
 
 
 @task(name="load-and-clean-data")

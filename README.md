@@ -79,10 +79,10 @@ Download `abalone.csv` from [Kaggle](https://www.kaggle.com/datasets/rodolfomend
 
 ### 3. Train the model
 
+From the project root:
+
 ```bash
-cd src/modelling
-python main.py ../../data/abalone.csv
-cd ../..
+python -m src.modelling.main data/abalone.csv
 ```
 
 This runs the Prefect training flow (load → clean → split → preprocess → train → evaluate → save) and writes `model.pkl` and `dict_vectorizer.pkl` to `src/web_service/local_objects/`. These objects are required by the API.
@@ -104,8 +104,7 @@ This runs the Prefect training flow (load → clean → split → preprocess →
 3. In **another terminal**, serve the retraining deployment (weekly, see `cron` in `deployment.py`):
 
    ```bash
-   cd src/modelling
-   python deployment.py
+   python -m src.modelling.deployment
    ```
 
 4. In the UI, go to **Deployments** → **train-model** and use **Quick Run** to trigger a training immediately.

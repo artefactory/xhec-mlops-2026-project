@@ -2,29 +2,11 @@ import pandas as pd
 from sklearn.base import RegressorMixin
 from sklearn.feature_extraction import DictVectorizer
 
+from src.modelling.preprocessing import add_features
 from src.web_service.lib.models import InputData, PredictionOut
 
 # Biological convention: age in years = number of rings + 1.5
 RINGS_TO_AGE_OFFSET = 1.5
-
-
-def add_features(df: pd.DataFrame) -> pd.DataFrame:
-    """Add the engineered features used at training time.
-
-    Must stay identical to `add_features` in src/modelling/preprocessing.py,
-    otherwise the DictVectorizer will not see the features the model was trained on.
-
-    Args:
-        df: The abalone measurements.
-
-    Returns:
-        A copy of df with shell_ratio, meat_ratio and volume columns.
-    """
-    df = df.copy()
-    df["shell_ratio"] = df["shell_weight"] / df["whole_weight"]
-    df["meat_ratio"] = df["shucked_weight"] / df["whole_weight"]
-    df["volume"] = df["length"] * df["diameter"] * df["height"]
-    return df
 
 
 def run_inference(input_data: InputData, dv: DictVectorizer, model: RegressorMixin) -> PredictionOut:
