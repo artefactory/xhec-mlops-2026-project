@@ -42,6 +42,12 @@ target/
 # Jupyter Notebook
 .ipynb_checkpoints
 
+# Downloaded datasets
+/src/web_service/local_objects/*.pkl
+/data/
+notebooks/mlruns/
+notebooks/mlflow.db
+
 # IPython
 profile_default/
 ipython_config.py
