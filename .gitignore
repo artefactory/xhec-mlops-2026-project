@@ -99,3 +99,4 @@ mlflow.db
 # Data files
 *.csv
 data/
+*.pkl
