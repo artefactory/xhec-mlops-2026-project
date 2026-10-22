@@ -79,6 +79,9 @@ dmypy.json
 # VSCode project settings
 .vscode/
 
+# Ruff
+.ruff_cache/
+
 # Secret files
 secrets/*
 !secrets/.gitkeep
