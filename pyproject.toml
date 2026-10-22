@@ -2,6 +2,9 @@
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools.packages.find]
+exclude = ["assets*", "notebooks*", "data*", "mlruns*"]
+
 [project]
 name = "xhec-mlops-project-student"
 version = "0.0.1"
