@@ -9,37 +9,24 @@
 
 ## 🎯 Project Overview
 
-Welcome to your MLOps project! In this hands-on project, you'll build a complete machine learning system to predict the age of abalone (a type of sea snail) using physical measurements instead of the traditional time-consuming method of counting shell rings under a microscope.
+This **group 7**'s submission for the X-HEC MLOps course with Artefact.
 
-**Your Mission**: Transform a simple ML model into a production-ready system with automated training, deployment, and prediction capabilities.
+Group members:
+- Martin Lau (martin.lau@hec.edu)
+- Yuqi Xin (yuqi.xin@hec.edu)
+- Julian Fix (julian.fix@hec.edu)
+- Scott Mayette (scott.mayette@hec.edu)
 
-## 📊 About the Dataset
-
-Traditionally, determining an abalone's age requires:
-1. Cutting the shell through the cone
-2. Staining it
-3. Counting rings under a microscope (very time-consuming!)
-
-**Your Goal**: Use easier-to-obtain physical measurements (shell weight, diameter, etc.) to predict the age automatically.
-
-📥 **Download**: Get the dataset from the [Kaggle page](https://www.kaggle.com/datasets/rodolfomendes/abalone-dataset)
+This project includes:
+- Notebook exploration
+- (Add more features as they get added progressively)
 
 
 ## 🚀 Quick Start
 
-### Prerequisites
-- GitHub account
-- [Kaggle account](https://www.kaggle.com/account/login?phase=startRegisterTab&returnUrl=%2F) (for dataset download)
-- Python 3.10 or 3.11
-
 ### Setup Steps
 
-1. **Fork this repository**
-   - ⚠️ **Important**: Uncheck "Copy the `main` branch only" to get all project branches
-
-2. **Add your team members** as admins to your forked repository
-
-3. **Set up your development environment**:
+1. **Set up your development environment**:
    ```bash
    # Create and activate a virtual environment
    uv sync
@@ -137,6 +124,18 @@ Then sync the environment and regenerate the dependency files:
 ```bash
 uv sync
 ```
+
+### MLflow Tracking
+
+- **Issue**: with MLflow 3.x (locked at 3.17.2), the file-based tracking store (`./mlruns`, the default) is in maintenance mode and raises an error, so the usual `mlflow ui --backend-store-uri mlruns` command fails.
+- **Resolution**: runs are stored in a local SQLite database, `mlflow.db` at the project root, and artifacts (models) go to the project-level `mlruns/` folder. The notebook sets both.
+- **View the runs** from the project root:
+
+```bash
+uv run mlflow ui --backend-store-uri sqlite:///mlflow.db
+```
+
+- `mlflow.db`, `mlruns/` and `data/` are git-ignored and must not be pushed.
 
 ### Code Quality
 - The pre-commit hooks will automatically format your code
