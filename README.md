@@ -65,13 +65,27 @@ make mlflow-ui
 
 Then open http://localhost:5000.
 
-### Train the model
+### Train the model with Prefect
 
-```bash
-make train-script
-```
+The training is a Prefect flow (`src/modelling/workflows.py`) made of tasks: load → preprocess → extract features → train → predict → evaluate. It saves the model (`model.pkl`) and the encoder (`dv.pkl`) in `src/web_service/local_objects/`, where the API loads them.
 
-This runs `src/modelling/main.py` on `data/abalone.csv`: it preprocesses the data, trains a linear regression, logs the test RMSE and saves the model (`model.pkl`) and the encoder (`dv.pkl`) in `src/web_service/local_objects/`, where the API loads them.
+1. **Start the Prefect server and UI** (keep this terminal open):
+   ```bash
+   make prefect-ui
+   ```
+   The UI is available at http://localhost:4200.
+
+2. **Train the model** (in a second terminal):
+   ```bash
+   make train
+   ```
+   The test RMSE is logged, and the flow run appears in the UI under **Flow Runs**.
+
+3. **Retrain regularly**: serve the deployment that retrains the model every Monday at midnight (keep this terminal open):
+   ```bash
+   make deploy
+   ```
+   The deployment `Train model/Weekly training` appears in the UI under **Deployments**, where you can also start a run manually (**Run** → **Quick run**).
 
 ## 📋 What You'll Build
 

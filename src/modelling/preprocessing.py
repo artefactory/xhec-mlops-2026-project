@@ -1,10 +1,12 @@
 import numpy as np
 import pandas as pd
 from config import CATEGORICAL_COLS, NUMERICAL_COLS, TARGET
+from prefect import task
 from scipy.sparse import csr_matrix
 from sklearn.feature_extraction import DictVectorizer
 
 
+@task(name="load_data")
 def load_data(path: str) -> pd.DataFrame:
     """Load the abalone dataset from a csv file."""
     return pd.read_csv(path)
@@ -29,6 +31,7 @@ def encode_categorical_cols(df: pd.DataFrame, categorical_cols: list[str] | None
     return df
 
 
+@task(name="preprocess_data")
 def preprocess_data(df: pd.DataFrame) -> pd.DataFrame:
     """Rename the columns, remove the outliers and encode the categorical columns."""
     df = rename_columns(df)
@@ -36,6 +39,7 @@ def preprocess_data(df: pd.DataFrame) -> pd.DataFrame:
     return encode_categorical_cols(df)
 
 
+@task(name="extract_x_y")
 def extract_x_y(
     df: pd.DataFrame, dv: DictVectorizer | None = None, with_target: bool = True
 ) -> tuple[csr_matrix, np.ndarray | None, DictVectorizer]:
