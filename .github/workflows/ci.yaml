@@ -8,7 +8,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+<<<<<<< HEAD
         python-version: ['3.10'] # TODO: update this version
+=======
+        python-version: ["3.10", "3.11"]
+>>>>>>> 0dc988e78d8614d584b4ea7e4568164e280a57c6
 
     steps:
       - uses: actions/checkout@v2
@@ -17,5 +21,19 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+<<<<<<< HEAD
       - name: # TODO create a step to install your project's dependencies
       - name: # TODO create a step to test the quality of your code
+=======
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --all-extras
+
+      - name: Run code quality checks
+        run: uv run pre-commit run --all-files
+>>>>>>> 0dc988e78d8614d584b4ea7e4568164e280a57c6
