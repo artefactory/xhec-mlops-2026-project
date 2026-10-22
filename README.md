@@ -24,6 +24,8 @@ Traditionally, determining an abalone's age requires:
 
 📥 **Download**: Get the dataset from the [Kaggle page](https://www.kaggle.com/datasets/rodolfomendes/abalone-dataset)
 
+The EDA notebook downloads the dataset into `data/` the first time you run its Data cell. The `data/` directory is ignored by Git; do not upload its contents to GitHub.
+
 
 ## 🚀 Quick Start
 
@@ -42,7 +44,7 @@ Traditionally, determining an abalone's age requires:
 3. **Set up your development environment**:
    ```bash
    # Create and activate a virtual environment
-   uv sync
+   uv sync --group notebook
    source venv/bin/activate # on Windows: venv\Scripts\activate
 
    # Install pre-commit hooks for code quality

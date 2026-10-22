@@ -41,10 +41,12 @@ Clone the team repository and install its dependencies:
 ```bash
 git clone <team-repository-url>
 cd <repository-folder>
-uv sync
+uv sync --group notebook
 ```
 
-`uv sync` creates and populates the project environment from the dependency files. You do not need to activate it to run project commands; prefix commands with `uv run`.
+`uv sync --group notebook` creates and populates the project environment, including the notebook dependencies. In VS Code, select the project `.venv` as the notebook kernel. You do not need to activate it to run project commands; prefix commands with `uv run`.
+
+The EDA notebook downloads the Abalone dataset into `data/` when you run its Data cell. The `data/` directory is ignored by Git and its contents should not be uploaded to GitHub.
 
 ## Development checks
 

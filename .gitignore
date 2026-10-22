@@ -42,6 +42,9 @@ target/
 # Jupyter Notebook
 .ipynb_checkpoints
 
+# Downloaded datasets
+/data/
+
 # IPython
 profile_default/
 ipython_config.py
