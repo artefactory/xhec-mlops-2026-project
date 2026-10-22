@@ -3258,7 +3258,7 @@ wheels = [
 [[package]]
 name = "xhec-mlops-project-student"
 version = "0.0.1"
-source = { editable = "." }
+source = { virtual = "." }
 dependencies = [
     { name = "fastapi" },
     { name = "pandas" },
