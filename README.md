@@ -1,223 +1,242 @@
-# MLOps Project: Abalone Age Prediction
+# Abalone Age Prediction
 
-[![Python Version](https://img.shields.io/badge/python-3.11-blue.svg)]()
-[![Linting: ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![Pre-commit](https://img.shields.io/badge/pre--commit-enabled-informational?logo=pre-commit&logoColor=white)](https://github.com/artefactory/xhec-mlops-project-student/blob/main/.pre-commit-config.yaml)
-</div>
+Predict abalone age from physical measurements: explore the data, train a
+linear-regression pipeline, schedule retraining with Prefect, and serve the
+saved pipeline through FastAPI. Predictions are **age in years** (`Rings + 1.5`),
+not ring counts.
 
-## 🎯 Project Overview
+## Team
 
-Welcome to your MLOps project! In this hands-on project, you'll build a complete machine learning system to predict the age of abalone (a type of sea snail) using physical measurements instead of the traditional time-consuming method of counting shell rings under a microscope.
+| Name | GitHub |
+| --- | --- |
+| Andreea Patarlageanu | [AndreeaPatarlageanu](https://github.com/AndreeaPatarlageanu) |
+| Oliver Smith | [oliversmith13](https://github.com/oliversmith13) (contributions), [oliversmithOM](https://github.com/oliversmithOM) (repository owner) |
+| Rémi Laget | [Remilaget](https://github.com/Remilaget) |
+| Ryan Balech | [RyanBalech](https://github.com/RyanBalech) |
 
-**Your Mission**: Transform a simple ML model into a production-ready system with automated training, deployment, and prediction capabilities.
+## Quick start: a prediction locally
 
-## 📊 About the Dataset
-
-Traditionally, determining an abalone's age requires:
-1. Cutting the shell through the cone
-2. Staining it
-3. Counting rings under a microscope (very time-consuming!)
-
-**Your Goal**: Use easier-to-obtain physical measurements (shell weight, diameter, etc.) to predict the age automatically.
-
-📥 **Download**: Get the dataset from the [Kaggle page](https://www.kaggle.com/datasets/rodolfomendes/abalone-dataset)
-
-The EDA notebook downloads the dataset into `data/` the first time you run its Data cell. The `data/` directory is ignored by Git; do not upload its contents to GitHub.
-
-
-## 🚀 Quick Start
-
-### Prerequisites
-- GitHub account
-- [Kaggle account](https://www.kaggle.com/account/login?phase=startRegisterTab&returnUrl=%2F) (for dataset download)
-- Python 3.11
-- [uv](https://docs.astral.sh/uv/getting-started/installation/)
-
-### Setup Steps
-
-1. **Fork this repository**
-   - ⚠️ **Important**: Uncheck "Copy the `main` branch only" to get all project branches
-
-2. **Add your team members** as admins to your forked repository
-
-3. **Set up your development environment**:
-   ```bash
-   # Install the locked dependencies for Parts 1 and 2
-   uv sync --locked --python 3.11 --group notebook
-
-   # Install pre-commit hooks for code quality
-   uv run pre-commit install
-   ```
-
-### Running Parts 1 and 2 locally
-
-In VS Code, select the repository's `.venv` Python interpreter as the notebook
-kernel. Run `notebooks/eda.ipynb` from top to bottom first, then
-`notebooks/modelling.ipynb`. EDA downloads the dataset if it is missing.
-Both notebooks use the same `data/abalone.csv` as the Part 2 training command.
-No environment activation is required for the `uv run` commands.
-
-Part 1 records the baseline and optional log-target experiment in MLflow.
-From the repository root, view them with:
+Prerequisites: Git, **Python 3.11**, and [uv](https://docs.astral.sh/uv/getting-started/installation/).
+Docker Desktop (running, Linux containers) or Docker Engine is required only
+for the container section. Run all commands from the repository root.
 
 ```bash
-uv run --group notebook mlflow ui --backend-store-uri sqlite:///data/mlflow.db
+git clone https://github.com/oliversmithOM/xhec-mlops-2026-project.git
+cd xhec-mlops-2026-project
+uv sync --locked --python 3.11
+uv run python -m scripts.download_data
+uv run python -m src.modelling.main data/abalone.csv
+uv run uvicorn src.web_service.main:app --host 127.0.0.1 --port 8000
 ```
 
-Open `http://127.0.0.1:5000`. The tracking database and model artifacts live
-under ignored `data/`; they are generated locally, not shared through Git.
-The optional log-target model is kept separate from the baseline. Part 2
-deliberately exports the simple baseline, rather than selecting a model
-automatically or logging a second set of MLflow experiments.
+The download uses the same public [Kaggle dataset](https://www.kaggle.com/datasets/rodolfomendes/abalone-dataset)
+as Part 1 and verifies its SHA-256. It preserves existing files. If Kaggle is
+unavailable, download `abalone.csv` from that page into `data/` and rerun the
+verification. No dataset or generated model is committed to Git.
 
-For Part 2 alone, `uv sync --locked --python 3.11` is sufficient; put the CSV
-at `data/abalone.csv` and use the training/prediction commands above. Every
-fresh clone needs its own CSV and must train once to create `model.pkl`.
-You do not need Docker, a web server, or Prefect for Parts 1 and 2.
+Training runs the Part 3 Prefect flow and writes
+`src/web_service/local_objects/model.pkl`. Without `PREFECT_API_URL`, Prefect
+starts a temporary local server for the run. The API itself does not need a
+Prefect or MLflow server.
 
-## 📋 What You'll Build
-
-By the end of this project, you'll have created:
-
-### 🤖 **Automated ML Pipeline**
-- Training workflows using Prefect
-- Automatic model retraining on schedule
-- Reproducible model and data processing
-
-### 🌐 **Prediction API**
-- REST API for real-time predictions
-- Input validation with Pydantic
-- Docker containerization
-
-### 📊 **Production-Ready Code**
-- Clean, well-documented code
-- Automated testing and formatting
-- Proper error handling
-
-## 📝 How to Work on This Project
-
-### The Branch-by-Branch Approach
-
-This project is organized into numbered branches, each representing a step in building your MLOps system. Think of it like a guided tutorial where each branch teaches you something new!
-
-**Here's how it works**:
-
-1. **Each branch = One pull request** with specific tasks
-2. **Follow the numbers** (branch_0, branch_1, etc.) in order
-3. **Read the PR instructions** (PR_0.md, PR_1.md, etc.) before starting
-4. **Complete all TODOs** in that branch's code
-5. **Create a pull request** when done
-6. **Merge and move to the next branch**
-
-### Step-by-Step Workflow
-
-For each numbered branch:
+Open **http://127.0.0.1:8000/docs**, expand `POST /predict`, click **Try it out**,
+and execute the supplied example. Or, in a second terminal:
 
 ```bash
-# Switch to the branch
-git checkout branch_number_i
-
-# Get latest changes (except for branch_0)
-git pull origin main
-# Note: A VIM window might open - just type ":wq" to close it
-
-# Push your branch
-git push
+curl -X POST http://127.0.0.1:8000/predict -H "Content-Type: application/json" --data-binary @examples/predict.json
 ```
 
-Then:
-1. 📖 Read the PR_i.md file carefully
-2. 💻 Complete all the TODOs in the code
-3. 🔧 Test your changes
-4. 📤 Open **ONE** pull request to your main branch
-5. ✅ Merge the pull request
-6. 🔄 Move to the next branch
+In PowerShell, use `curl.exe` in that command, or:
 
-> **💡 Pro Tip**: Always integrate your previous work when starting a new branch (except branch_0)!
+```powershell
+Invoke-RestMethod -Uri http://127.0.0.1:8000/predict -Method Post -ContentType 'application/json' -Body (Get-Content examples/predict.json -Raw)
+```
 
-### 🔍 Understanding Pull Requests
+The response contains `age_years` and `model_sha256` (the loaded artifact's
+checksum). `GET /health` confirms the model is loaded; `/docs` and
+`/openapi.json` document the API. Stop the local server with `Ctrl+C`.
 
-Pull Requests (PRs) are how you propose and review changes before merging them into your main codebase. They're essential for team collaboration!
+## Run the API in Docker
 
-**Important**: When creating a PR, make sure you're merging into YOUR forked repository, not the original:
-
-❌ **Wrong** (merging to original repo):
-![PR Wrong](assets/PR_wrong.png)
-
-✅ **Correct** (merging to your fork):
-![PR Right](assets/PR_right.png)
-
-## 💡 Development Tips
-
-### Managing Dependencies
-
-Use uv to manage dependencies. Install or update packages with:
+Complete download and training above first. The model is mounted read-only,
+not baked into the image. The build excludes datasets, models, notebooks,
+Git metadata, and local environments.
 
 ```bash
-uv add <package>==<version>
+docker build -f Dockerfile.app -t abalone-api .
 ```
 
-Then sync the environment and regenerate the dependency files:
+PowerShell:
+
+```powershell
+docker run --rm --name abalone-api -p 127.0.0.1:8000:8001 --mount "type=bind,source=$((Get-Location).Path)/src/web_service/local_objects,target=/app/src/web_service/local_objects,readonly" abalone-api
+```
+
+macOS/Linux:
 
 ```bash
-uv sync
+docker run --rm --name abalone-api -p 127.0.0.1:8000:8001 --mount "type=bind,source=$PWD/src/web_service/local_objects,target=/app/src/web_service/local_objects,readonly" abalone-api
 ```
 
-### Code Quality
-- The pre-commit hooks will automatically format your code
-- Remove all TODOs and unused code before final submission
-- Use clear variable names and add docstrings
+The same `/docs`, `/health`, and `/predict` URLs work on port **8000**. The
+container listens on **8001** internally and runs as a non-root user. The
+host port is bound to loopback for this local demo. To intentionally expose it
+on your network, use `-p 0.0.0.0:8000:8001`. No authentication is implemented;
+this is a course/demo service, not an Internet deployment.
 
-## 📊 Evaluation Criteria
+From another terminal, verify actual HTTP predictions against the local model:
 
-Your project will be evaluated on:
+```bash
+uv run python -m scripts.smoke_api
+docker inspect --format '{{.State.Health.Status}}' abalone-api
+docker stop abalone-api
+```
 
-### 🔍 **Code Quality**
-- Clean, readable code structure
-- Proper naming conventions
-- Good use of docstrings and type hints
+`bin/run_services.sh` starts only Uvicorn and forwards shutdown signals via
+`exec`. Prefect remains a separate service (see below), so port 4201 is not
+exposed by this API container. Locked dependencies are installed from
+`pyproject.toml` / `uv.lock`; this project does not maintain duplicate
+`requirements.in` or `requirements.txt` files.
 
-### 🎨 **Code Formatting**
-- Consistent style (automated with pre-commit)
-- Professional presentation
+## API input and model lifecycle
 
-### ⚙️ **Functionality**
-- Code runs without errors
-- All requirements implemented correctly
+`POST /predict` accepts one object with exactly the eight fields shown in
+`examples/predict.json`: `sex` (`M`, `F`, or `I`), `length`, `diameter`, `height`,
+`whole_weight`, `shucked_weight`, `viscera_weight`, and `shell_weight`.
+Use the numeric scale in the training CSV; do not convert the measurements
+to different units. All numeric values must be finite and nonnegative.
+Zero height is allowed because it occurs in the original dataset.
 
-### 📖 **Documentation & Reproducibility**
-- Clear README with setup instructions
-- Team member names and GitHub usernames
-- Step-by-step instructions to run everything
+Missing fields, extra fields (including `Rings` and `Age`), negative values,
+numeric strings, booleans, and unknown sex codes return HTTP **422**. These
+checks validate the input format; they do not establish biological plausibility
+or guarantee reliable extrapolation. Predictions are not clipped or rounded.
 
-### 🤝 **Collaboration**
-- Effective use of Pull Requests
-- Good teamwork and communication
+The entire fitted encoder/scaler/regressor is loaded **once at startup**.
+Missing, corrupt, unfitted, or incompatible models fail startup with a clear
+error rather than returning fabricated predictions. Set `MODEL_PATH` to use
+another trusted local artifact (and mount that path when using Docker).
+Never load pickle files from untrusted sources.
 
----
+After retraining, restart the API to load the new file. `/health` and prediction
+responses expose the loaded model hash, so you can verify which version is
+being served. Scheduled retraining does not silently hot-reload a live API.
 
-## 🎯 Final Deliverables Checklist
+## Part 1: exploration and MLflow experiments
 
-When you're done, your repository should contain:
+```bash
+uv sync --locked --python 3.11 --group notebook
+```
 
-✅ **Automated Training Pipeline**
-- [ ] Prefect workflows for model training
-- [ ] Separate modules for training and inference
-- [ ] Reproducible model and encoder generation
+In VS Code, select the project's `.venv` interpreter as the notebook kernel.
+Run `notebooks/eda.ipynb`, then `notebooks/modelling.ipynb`, top to bottom.
+EDA covers distributions, missing values, duplicates, categorical counts,
+outliers, and correlations. The modelling notebook compares the baseline
+with a log-target experiment; both runs are logged locally.
 
-✅ **Automated Deployment**
-- [ ] Prefect deployment for regular retraining
+```bash
+uv run --group notebook mlflow ui --backend-store-uri sqlite:///data/mlflow.db --host 127.0.0.1 --port 5000
+```
 
-✅ **Production API**
-- [ ] Working REST API for predictions
-- [ ] Pydantic input validation
-- [ ] Docker containerization
+Open http://127.0.0.1:5000. The SQLite database and artifacts live under ignored
+`data/`. Use the same database path when launching the UI; the former README
+template's `notebooks/mlflow.db` path is no longer used.
 
-✅ **Professional Documentation**
-- [ ] Updated README with team info
-- [ ] Clear setup and run instructions
-- [ ] All TODOs removed from code
+## Parts 2 and 3: training and scheduled retraining
 
----
+`src/modelling/` separates preprocessing, training/evaluation, serialization,
+and prediction. The pipeline one-hot encodes categoricals, scales numeric
+inputs, and fits linear regression. Both target columns are excluded from
+features. Preprocessing fits only on the training split.
 
-**Ready to start? Head to branch_0 and read PR_0.md for your first task! 🚀**
+```bash
+uv run python -m src.modelling.main data/abalone.csv
+uv run python -m src.modelling.predicting src/web_service/local_objects/model.pkl data/abalone.csv
+```
+
+Use `--model-path path/to/model.pkl` on the training command to change the
+output. The prediction CLI accepts raw CSV measurement columns (with spaces
+and capital letters as in Kaggle); the HTTP API uses snake_case field names.
+The saved model is the training-split model used for evaluation, not a refit
+on all rows.
+
+For scheduled retraining, start the Prefect server in one terminal:
+
+```bash
+uv run prefect server start --host 127.0.0.1 --port 4200
+```
+
+In a second terminal, from the repository root:
+
+```powershell
+# PowerShell
+$env:PREFECT_API_URL = "http://127.0.0.1:4200/api"
+uv run python -m src.modelling.deployment
+```
+
+```bash
+# macOS/Linux
+PREFECT_API_URL=http://127.0.0.1:4200/api uv run python -m src.modelling.deployment
+```
+
+Keep both terminals running. The deployment retrains daily at **02:00 UTC**
+and pauses when its runner stops. View runs at http://127.0.0.1:4200. To trigger
+one immediately, set `PREFECT_API_URL` in a third terminal as above, then run:
+
+```bash
+uv run prefect deployment run "Abalone model training/daily-abalone-retraining" --watch
+```
+
+Stop the API before retraining for a coordinated update, then start it again
+after the flow finishes. Stop the server/runner with `Ctrl+C` when finished.
+
+## Results and limitations
+
+The 4,177-row dataset has no missing values or duplicate rows. We preserve
+the Part 1 rows, including outliers and zero heights. With a reproducible
+80/20 split (`random_state=42`), 836 rows are held out:
+
+| Model | RMSE (years) | MAE (years) | R² |
+| --- | ---: | ---: | ---: |
+| Linear regression baseline (served) | 2.212 | 1.593 | 0.548 |
+| Log-target experiment | 2.220 | 1.570 | 0.545 |
+
+The baseline is retained for its slightly lower RMSE and simplicity. These
+are single-split results, not guarantees for new populations. Linear
+regression may extrapolate poorly outside the training distribution. There
+is no automatic model selection, model promotion, or prediction interval.
+
+## Checks and continuous integration
+
+Each teammate runs `uv run pre-commit install` once in their own clone.
+
+```bash
+uv run pre-commit run --all-files
+uv run python -m unittest discover -s tests
+```
+
+GitHub runs checks on pushes and pull requests: formatting/linting, training
+and API tests, Docker build, and an actual container HTTP smoke test. See the
+**Actions** tab. CI uses a deterministic synthetic model fixture for the
+container test, so it does not depend on Kaggle availability. Real-data
+accuracy is evaluated separately by the training command.
+
+If GNU Make is installed, `make setup`, `make data`, `make train`, `make api`,
+`make test`, `make check`, and `make docker-build` wrap the same commands.
+Make is optional; all direct commands above work in PowerShell.
+
+## Repository layout and contributions
+
+- `notebooks/`: Part 1 EDA and MLflow experiments.
+- `src/modelling/`: Parts 2–3 training modules, Prefect flow and deployment.
+- `src/web_service/`: Part 4 validated API and model loading.
+- `Dockerfile.app`, `bin/run_services.sh`: container build and startup.
+- `scripts/`: verified data download and live API smoke check.
+- `tests/`: training, serialization, API validation, and lifecycle tests.
+- `examples/predict.json`: runnable API request.
+- `pyproject.toml`, `uv.lock`: Part 0 dependency management.
+- `.github/workflows/ci.yaml`: checks and container verification.
+
+All assessed work must be merged into `main`. Every student must contribute
+meaningful commits using their GitHub-linked identity. Merge pull requests
+with **Create a merge commit**, never squash, to preserve individual history.

@@ -1,0 +1,10 @@
+**
+!pyproject.toml
+!uv.lock
+!src/
+!src/**
+!bin/
+!bin/run_services.sh
+**/__pycache__/
+**/*.pyc
+**/*.pkl
