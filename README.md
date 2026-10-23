@@ -10,7 +10,7 @@ not ring counts.
 | Name | GitHub |
 | --- | --- |
 | Andreea Patarlageanu | [AndreeaPatarlageanu](https://github.com/AndreeaPatarlageanu) |
-| Oliver Smith | [oliversmithOM](https://github.com/oliversmithOM) |
+| Oliver Smith | [oliversmith13](https://github.com/oliversmith13) (contributions), [oliversmithOM](https://github.com/oliversmithOM) (repository owner) |
 | Rémi Laget | [Remilaget](https://github.com/Remilaget) |
 | Ryan Balech | [RyanBalech](https://github.com/RyanBalech) |
 
@@ -28,9 +28,6 @@ uv run python -m scripts.download_data
 uv run python -m src.modelling.main data/abalone.csv
 uv run uvicorn src.web_service.main:app --host 127.0.0.1 --port 8000
 ```
-
-While Part 4 is under review, switch to `4/deploy_model_api` after cloning.
-After merging, the default `main` branch contains these commands.
 
 The download uses the same public [Kaggle dataset](https://www.kaggle.com/datasets/rodolfomendes/abalone-dataset)
 as Part 1 and verifies its SHA-256. It preserves existing files. If Kaggle is
