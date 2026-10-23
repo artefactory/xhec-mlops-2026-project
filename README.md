@@ -20,9 +20,29 @@ Prerequisites: Git, **Python 3.11**, and [uv](https://docs.astral.sh/uv/getting-
 Docker Desktop (running, Linux containers) or Docker Engine is required only
 for the container section. Run all commands from the repository root.
 
+Run commands in a terminal, not at the Python `>>>` prompt. On Windows, use
+PowerShell consistently for this setup; WSL has a separate Python environment.
+Activation is not required because `uv run` selects the project environment.
+
+If the repository is already cloned, open its root folder and skip these two
+commands:
+
 ```bash
 git clone https://github.com/oliversmithOM/xhec-mlops-2026-project.git
 cd xhec-mlops-2026-project
+```
+
+While Part 4 is under review, switch branches before installing or running:
+
+```bash
+git switch 4/deploy_model_api
+```
+
+After merging, use `main` instead. Before changing the Python version of an
+existing `.venv`, stop servers and notebook kernels using it; see
+[Common setup problems](#common-setup-problems) if Windows prevents the update.
+
+```bash
 uv sync --locked --python 3.11
 uv run python -m scripts.download_data
 uv run python -m src.modelling.main data/abalone.csv
@@ -61,6 +81,9 @@ checksum). `GET /health` confirms the model is loaded; `/docs` and
 Complete download and training above first. The model is mounted read-only,
 not baked into the image. The build excludes datasets, models, notebooks,
 Git metadata, and local environments.
+
+Stop the local Uvicorn server with `Ctrl+C` before starting the container:
+both use port **8000** on your computer. Keep Docker Desktop running.
 
 ```bash
 docker build -f Dockerfile.app -t abalone-api .
@@ -189,6 +212,72 @@ uv run prefect deployment run "Abalone model training/daily-abalone-retraining" 
 
 Stop the API before retraining for a coordinated update, then start it again
 after the flow finishes. Stop the server/runner with `Ctrl+C` when finished.
+
+## Common setup problems
+
+### Windows cannot replace the virtual environment
+
+If `uv sync --locked --python 3.11` reports that `.venv/Scripts` is in use or
+access is denied, an existing environment may still be used by Uvicorn,
+Prefect, a notebook kernel, or an editor extension. This can happen when
+replacing an environment created with another Python version.
+
+Stop running servers with `Ctrl+C`, shut down notebook kernels, and run
+`deactivate` if the environment is activated in your terminal. Close VS Code
+completely to stop extensions such as the Black formatter. Then open a
+separate PowerShell window in the repository root and retry:
+
+```powershell
+uv sync --locked --python 3.11
+```
+
+Deactivating a terminal alone does not stop background processes. If the lock
+persists, restart Windows and retry before reopening the editor. If access is
+still denied, inspect the folder permissions rather than deleting the folder
+or changing permissions blindly. A fresh clone without an existing `.venv`
+does not need to replace an old environment.
+
+### A command runs in the wrong environment
+
+Use `uv run` for project commands rather than a globally installed `python`
+or `uvicorn`. Check the selected interpreter with:
+
+```bash
+uv run python --version
+```
+
+It should report Python **3.11.x** after the setup command. If the prompt is
+`>>>`, enter `exit()` before running terminal commands. PowerShell and WSL
+use different Python installations; do not alternate between them using the
+same `.venv` directory.
+
+### Port 8000 is already in use
+
+Run either the local API or the Docker API on host port 8000, not both at
+once. Stop the local server with `Ctrl+C`, or stop the running lab container
+with `docker stop abalone-api`, before starting the other. If another
+application owns the port, identify it before stopping anything.
+
+### Training tries to contact a stopped Prefect server
+
+The scheduled-retraining setup sets `PREFECT_API_URL`. In PowerShell this
+remains set for the current terminal session after the server is stopped.
+Restart the configured server to continue scheduled work, or remove that
+session variable when returning to standalone training:
+
+```powershell
+Remove-Item Env:PREFECT_API_URL -ErrorAction SilentlyContinue
+```
+
+In a Linux/WSL shell where the variable was exported, use:
+
+```bash
+unset PREFECT_API_URL
+```
+
+Then rerun the training command. If a Prefect profile also configures a server
+URL, that configuration must be checked separately; clearing an environment
+variable does not change saved profiles.
 
 ## Results and limitations
 
